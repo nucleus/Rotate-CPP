@@ -54,12 +54,14 @@ bool Image::createImageFromFile(const char* fname) {
     width = ppmGetInt(in);
     height = ppmGetInt(in);
     maxcolor = ppmGetInt(in);
-		
-    pixels.reserve(width * height);
+	x_off = (float)width / 2.0;
+	y_off = (float)height / 2.0;
+	
+    pixels = new Pixel*[width*height];
     for(int i = 0; i < width * height; i++) {
         Pixel *p = new Pixel;
 		in.read((char*)p,3);
-		pixels.push_back(p);
+		pixels[i] = p;
 	}
 
 	in.close();
@@ -77,10 +79,12 @@ void Image::createImageFromBuffer(int width, int height, int depth, Pixel* pels)
     this->height = height;
     this->depth = depth;
     this->maxcolor = RGB_MAX_COLOR;
-    pixels.reserve(width*height);
+	x_off = (float)width / 2.0;
+	y_off = (float)height / 2.0;
+    pixels = new Pixel*[width*height];
     for(int i = 0; i < width*height; i++) {
 		Pixel *p = pels + i;
-        pixels.push_back(p);
+		pixels[i] = p;
 	}
 }
 
@@ -95,11 +99,13 @@ void Image::createImageFromTemplate(int width, int height, int depth) {
 	this->height = height;
 	this->depth = depth;
 	this->maxcolor = RGB_MAX_COLOR;
-	pixels.reserve(width*height);
-	for(int i = 0; i < pixels.capacity(); i++) {
+	x_off = (float)width / 2.0;
+	y_off = (float)height / 2.0;
+	pixels = new Pixel*[width*height];
+	for(int i = 0; i < width*height; i++) {
 		Pixel *p = new Pixel;
 		p->r = p->g = p->b = 0;
-		pixels.push_back(p);
+		pixels[i] = p;
 	}
 }
 /*
@@ -148,7 +154,7 @@ Pixel Image::getPixelAt(int x, int y) {
     Pixel p = {0,0,0};
     if(!(x >= 0 && y >= 0 && x < (int)width && y < (int)height)) 
 		return p;
-    return *(pixels.at(y*width + x));
+    return *(pixels[y*width + x]);
 }
 
 /*
@@ -174,12 +180,11 @@ void Image::setPixelAt(int x, int y, Pixel* p) {
 *	or at maximum one pixel outside the picture.
 */
 bool Image::containsPixel(Coord* pix) {
-	
-	int true_x = (int)(pix->x + (float)width/2.0);
-	int true_y = (int)abs(pix->y - (float)height/2.0);
-	bool x_cond = (true_x >= 0) || (true_x < width);
-	bool y_cond = (true_y >= 0) || (true_y < height);
-	return x_cond && y_cond;
+	bool x_correct = (pix->x < x_off) && (pix->x > (0.0-x_off));
+	bool y_correct = (pix->y < y_off) && (pix->y > (0.0-y_off));
+	if(x_correct && y_correct)
+		return true;
+	return false;
 }
 
 /*
@@ -188,13 +193,14 @@ bool Image::containsPixel(Coord* pix) {
 *	Cleans up the memory used for storing the pixel colors. TODO: DEBUG
 */
 void Image::clean() {
-// 	for(int i = 0; i < pixels.size(); i++) {
-// 		if(pixels[i] != NULL) {
-// 			Pixel *p = pixels[i];
-// 			delete(p);
-// 			pixels[i] = NULL;
-// 		}
-// 	}
+//  	for(int i = 0; i < width*height; i++) {
+//  		if(pixels[i] != NULL) {
+//  			Pixel *p = pixels[i];
+//  			delete(p);
+//  			pixels[i] = NULL;
+//  		}
+//  	}
+// 	delete(pixels);
 }
 
 /*

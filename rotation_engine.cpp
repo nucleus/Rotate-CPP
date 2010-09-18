@@ -105,8 +105,6 @@ void RotateEngine::run() {
 	float x_offset = (float)target_w/2.0;
 	float y_offset = (float)target_h/2.0;
 	
-	fprintf(stdout, "New image -- width: %d height: %d\n", target_w, target_h);
-	
 	for(int i = 0; i < target_h; i++) {
 		for(int j = 0; j < target_w; j++) {
 			/* Find origin pixel for current destination pixel */

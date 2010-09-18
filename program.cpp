@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
 
     if(!re.init(srcfile, destfile, angle)) return BAD_EXIT;
 
-	//re.printRotationState();
+	re.printRotationState();
 
 	TIME(start);
     re.run();

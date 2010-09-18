@@ -78,9 +78,10 @@ class Image {
         unsigned int getMaxcolor();
 		void clean();
 	private:
-		vector<Pixel*> pixels;
+		Pixel** pixels;
 		unsigned int width, height;
 		unsigned int depth, maxcolor;
+		float x_off, y_off;
 		int ppmGetInt(fstream &src);
 		char ppmGetChar(fstream &src);
 };
