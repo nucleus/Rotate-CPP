@@ -81,6 +81,9 @@ void RotateEngine::run() {
 	unsigned int width = input.getWidth();
 	unsigned int depth = input.getDepth();
 	
+	float x_offset_source = (float)width / 2.0;
+	float y_offset_source = (float)height / 2.0;
+	
 	Pixel * buffer;
 	
 	/* Steps for rotation:
@@ -102,13 +105,13 @@ void RotateEngine::run() {
 		
 	/* STEP 2 */
 	unsigned int rev_angle = 360 - angle;
-	float x_offset = (float)target_w/2.0;
-	float y_offset = (float)target_h/2.0;
+	float x_offset_target = (float)target_w/2.0;
+	float y_offset_target = (float)target_h/2.0;
 	
 	for(int i = 0; i < target_h; i++) {
 		for(int j = 0; j < target_w; j++) {
 			/* Find origin pixel for current destination pixel */
-			Coord cur = {-x_offset + (float)j, y_offset - (float)i};
+			Coord cur = {-x_offset_target + (float)j, y_offset_target - (float)i};
 			Coord origin_pix = rotatePoint(&cur, rev_angle);
 			/* If original image contains point, sample colour and write back */
 			if(input.containsPixel(&origin_pix)) {
@@ -116,12 +119,11 @@ void RotateEngine::run() {
 				Pixel colors[4];
 				// Get sample positions
 				for(int k = 0; k < 4; k++) {
-					samples[k][0] = (int)(origin_pix.x + x_offset) + ((k == 2 || k == 3) ? 1 : 0);
-					samples[k][1] = (int)abs(origin_pix.y - y_offset) + ((k == 1 || k == 3) ? 1 : 0);
+					samples[k][0] = (int)(origin_pix.x + x_offset_source) + ((k == 2 || k == 3) ? 1 : 0);
+					samples[k][1] = (int)abs(origin_pix.y - y_offset_source) + ((k == 1 || k == 3) ? 1 : 0);
 				}
 				// Get color samples
 				for(int k = 0; k < 4; k++) {
-					//printf("Sampling point (%d, %d)\n", samples[k][0], samples[k][1]);
 					colors[k] = input.getPixelAt(samples[k][0], samples[k][1]);
 				}
 				// Filter colors
