@@ -1,4 +1,4 @@
-CFLAGS  = -g -std=c++0x -O3
+CFLAGS  = -std=c++0x -O3 -ffast-math
 SOURCES = image.cpp rotation_engine.cpp program.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 EXECUTABLE = rot

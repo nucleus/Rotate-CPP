@@ -13,7 +13,7 @@
 /*
 *	File: program.cpp
 *	-----------------
-*	Main file for the rotation matrix - bresenham image rotation tool and benchmark.
+*	Main file for the rotation matrix image rotation tool and benchmark.
 *	Implements the timing for the benchmark by using an msec-resolution timer and
 *	contains the programs main function.
 */
@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
 
     if(!re.init(srcfile, destfile, angle)) return BAD_EXIT;
 
-	re.printRotationState();
+	//re.printRotationState();
 
 	TIME(start);
     re.run();

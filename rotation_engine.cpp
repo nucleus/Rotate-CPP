@@ -20,6 +20,7 @@
 #include "rotation_engine.h"
 
 #define PI M_PI
+#define PRECISION 3
 #define printPoint(a) printf("(%d,%d)\n",(int)a.x,(int)a.y)
 
 using namespace std;
@@ -80,7 +81,6 @@ void RotateEngine::run() {
 	unsigned int height = input.getHeight();
 	unsigned int width = input.getWidth();
 	unsigned int depth = input.getDepth();
-	
 	float x_offset_source = (float)width / 2.0;
 	float y_offset_source = (float)height / 2.0;
 	
@@ -117,22 +117,22 @@ void RotateEngine::run() {
 			if(input.containsPixel(&origin_pix)) {
 				int samples[4][2];
 				Pixel colors[4];
-				// Get sample positions
+				/* Get sample positions */
 				for(int k = 0; k < 4; k++) {
 					samples[k][0] = (int)(origin_pix.x + x_offset_source) + ((k == 2 || k == 3) ? 1 : 0);
 					samples[k][1] = (int)abs(origin_pix.y - y_offset_source) + ((k == 1 || k == 3) ? 1 : 0);
 				}
-				// Get color samples
+				/* Get colors for samples */
 				for(int k = 0; k < 4; k++) {
 					colors[k] = input.getPixelAt(samples[k][0], samples[k][1]);
 				}
-				// Filter colors
-				Pixel final = interpolate(colors, 4);
-				// Write output
+				/* Filter colors */
+				Pixel final = filter(colors, &origin_pix, 4);
+				/* Write output */
 				buffer[i*target_w + j] = final;
 			}
 			else {
-				// Write black pixel
+				/* Pixel is not in source image, write black color */
 				buffer[i*target_w + j] = {0,0,0};
 			}
 		}
@@ -187,8 +187,9 @@ bool RotateEngine::writeOutImage() {
 	}
     if(output.getDepth() == 3) {
         out << "P6\n";
-    } else
+    } else {
         return false;
+	}
     out << output.getWidth() << " " << output.getHeight() << "\n" << output.getMaxcolor() << "\n";
     for(int i = 0; i < (int)output.getHeight(); i++) {
         for(int j = 0; j < (int)output.getWidth(); j++) {
@@ -282,24 +283,34 @@ inline float RotateEngine::findMin(float* seq) {
 }
 
 /*
-*	Function: interpolate
+*	Function: filter
 *	---------------------
-*	Interpolates a given array of pixel colours of length len, blending
-*	color values into a final pixel. Currently calculates the arithmetic mean
-*	of all color components, should be redone to linearly interpolate according
-*	to the original sample positions of the color values.
+*	Filters a given array of pixel colours of length len, blending
+*	color values into a final pixel. The algorithm used is bilinear
+*	filtering, using the sample position as a weight for color blend.
 */
-inline Pixel RotateEngine::interpolate(Pixel* colors, int len) {
+inline Pixel RotateEngine::filter(Pixel* colors, Coord* sample_pos, int len) {
 	uint32_t r, g, b;
-	for(int i = 0; i < len; i++) {
-		r += colors[i].r;
-		g += colors[i].g;
-		b += colors[i].b;
-	}
-	r /= len;
-	g /= len;
-	b /= len;
-	Pixel target = {(uint8_t)r,(uint8_t)g,(uint8_t)b};
-	return target;
+	float x_weight = round(sample_pos->x - floor(sample_pos->x), PRECISION);
+	float y_weight = round(sample_pos->y - floor(sample_pos->y), PRECISION);
+	
+	Pixel sample_v_upper = interpolateLinear(&colors[0], &colors[3], x_weight);
+	Pixel sample_v_lower = interpolateLinear(&colors[1], &colors[2], x_weight);
+	Pixel sample_h = interpolateLinear(&sample_v_upper, &sample_v_lower, y_weight);
+	
+	return sample_h;
+}
+
+/*
+*	Function: interpolateLinear
+*	---------------------------
+*	Linearly interpolates two pixel colors according to a given weight factor.
+*/
+inline Pixel RotateEngine::interpolateLinear(Pixel* a, Pixel* b, float weight) {
+	Pixel final;
+	final.r = a->r * (1.0-weight) + b->r * weight;
+	final.g = a->g * (1.0-weight) + b->g * weight;
+	final.b = a->b * (1.0-weight) + b->b * weight;
+	return final;
 }
 

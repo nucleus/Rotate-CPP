@@ -26,10 +26,8 @@
 				INCLUDES & DEFINES
 ***********************************************************************************/
 
-#include <iostream>
 #include <fstream>
-#include <vector>
-#include <cmath>
+#include <iostream>
 #include <stdint.h>
 #include <stdio.h>
 

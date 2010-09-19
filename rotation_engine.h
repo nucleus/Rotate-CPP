@@ -23,8 +23,6 @@
 #ifndef R_ENGINE_H
 #define R_ENGINE_H
 
-#define error(msg)  do{cout<<msg<<endl; exit(-1);}while(0)
-
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
@@ -60,7 +58,8 @@ class RotateEngine {
 		int computeTargetWidth();
 		float findMax(float* seq);
 		float findMin(float* seq);
-		Pixel interpolate(Pixel* colors, int len);
+		Pixel filter(Pixel* colors, Coord* sample_pos, int len);
+		Pixel interpolateLinear(Pixel* a, Pixel* b, float weight);
 };
 
 #endif

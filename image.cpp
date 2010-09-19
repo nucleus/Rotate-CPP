@@ -83,7 +83,10 @@ void Image::createImageFromBuffer(int width, int height, int depth, Pixel* pels)
 	y_off = (float)height / 2.0;
     pixels = new Pixel*[width*height];
     for(int i = 0; i < width*height; i++) {
-		Pixel *p = pels + i;
+		Pixel *p = new Pixel;
+		p->r = pels[i].r;
+		p->g = pels[i].g;
+		p->b = pels[i].b;
 		pixels[i] = p;
 	}
 }
@@ -190,17 +193,16 @@ bool Image::containsPixel(Coord* pix) {
 /*
 *	Function: clean
 *	---------------
-*	Cleans up the memory used for storing the pixel colors. TODO: DEBUG
+*	Cleans up the memory used for storing the pixel colors.
 */
 void Image::clean() {
-//  	for(int i = 0; i < width*height; i++) {
-//  		if(pixels[i] != NULL) {
-//  			Pixel *p = pixels[i];
-//  			delete(p);
-//  			pixels[i] = NULL;
-//  		}
-//  	}
-// 	delete(pixels);
+	if(pixels) {
+		for(int i = 0; i < width * height; i++) {
+			delete(pixels[i]);
+			pixels[i] = NULL;
+		}
+		delete [] pixels;
+	}
 }
 
 /*
