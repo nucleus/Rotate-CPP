@@ -198,8 +198,10 @@ bool Image::containsPixel(Coord* pix) {
 void Image::clean() {
 	if(pixels) {
 		for(int i = 0; i < width * height; i++) {
-			delete(pixels[i]);
-			pixels[i] = NULL;
+			if(pixels[i]) {
+				delete(pixels[i]);
+				pixels[i] = NULL;
+			}
 		}
 		delete [] pixels;
 	}

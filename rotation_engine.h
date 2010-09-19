@@ -58,7 +58,7 @@ class RotateEngine {
 		int computeTargetWidth();
 		float findMax(float* seq);
 		float findMin(float* seq);
-		Pixel filter(Pixel* colors, Coord* sample_pos, int len);
+		Pixel filter(Pixel* colors, Coord* sample_pos);
 		Pixel interpolateLinear(Pixel* a, Pixel* b, float weight);
 };
 

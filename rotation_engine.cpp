@@ -127,7 +127,7 @@ void RotateEngine::run() {
 					colors[k] = input.getPixelAt(samples[k][0], samples[k][1]);
 				}
 				/* Filter colors */
-				Pixel final = filter(colors, &origin_pix, 4);
+				Pixel final = filter(colors, &origin_pix);
 				/* Write output */
 				buffer[i*target_w + j] = final;
 			}
@@ -171,7 +171,7 @@ void RotateEngine::printRotationState() {
 ***********************************************************************************/
 
 /*
-*	Function: writeOutOmage
+*	Function: writeOutImage
 *	-----------------------
 *	Writes output image of the kernel back to disk. Returns false if
 *	called before an output image is produced. Returns true if writing back
@@ -285,11 +285,11 @@ inline float RotateEngine::findMin(float* seq) {
 /*
 *	Function: filter
 *	---------------------
-*	Filters a given array of pixel colours of length len, blending
+*	Filters a given array of pixel colours of length 4, blending
 *	color values into a final pixel. The algorithm used is bilinear
 *	filtering, using the sample position as a weight for color blend.
 */
-inline Pixel RotateEngine::filter(Pixel* colors, Coord* sample_pos, int len) {
+inline Pixel RotateEngine::filter(Pixel* colors, Coord* sample_pos) {
 	uint32_t r, g, b;
 	float x_weight = round(sample_pos->x - floor(sample_pos->x), PRECISION);
 	float y_weight = round(sample_pos->y - floor(sample_pos->y), PRECISION);
